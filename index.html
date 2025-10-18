@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh" class="no-scrollbar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Urbit · 你的数字主权宇宙 - 永久身份、端到端加密、自主网络">
+  <title>Urbit · Infinite Horizon</title>
+
+  <!-- 字体与图标 -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    @keyframes fadeIn { to { opacity: 1; } }
+    @keyframes pulseGlow { 0%,100% { opacity: 0.4; filter: blur(40px); } 50% { opacity: 0.8; filter: blur(60px); } }
+    @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes textShine { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+    @keyframes meteor { from { transform: translate(-100px, -100px) rotate(-45deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } to { transform: translate(110vw, 110vh); opacity: 0; } }
+    @keyframes ripple { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(3); opacity: 0; } }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes terminalBlink { 0%,80%,100% { opacity: 1; } 90% { opacity: 0; } }
+
+    :root {
+      --primary: #00b4db;
+      --primary-light: #00d4ff;
+      --primary-glow: rgba(0, 180, 219, 0.3);
+      --bg: #060614;
+      --bg-deep: #03030a;
+      --text: #e0f4ff;
+      --text-light: #a8c8e0;
+      --card-bg: rgba(30, 40, 70, 0.35);
+      --border-light: rgba(100, 200, 255, 0.1);
+      --glow: 0 0 20px rgba(0, 180, 219, 0.4);
+      --glow-strong: 0 0 40px rgba(0, 180, 219, 0.6);
+      --transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: var(--transition);
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg-deep);
+    }
+
+    body {
+      opacity: 0;
+      animation: fadeIn 1.2s forwards;
+    }
+
+    /* =============== 全局样式 =============== */
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* =============== 背景系统 =============== */
+    .bg-gradient {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #060614, #0a1a3a, #000c2a);
+      z-index: -6;
+    }
+
+    .glow {
+      position: fixed;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--primary-light), transparent 70%);
+      filter: blur(80px);
+      opacity: 0.3;
+      z-index: -5;
+      animation: pulseGlow 8s ease-in-out infinite alternate;
+    }
+
+    /* =============== 3D 星图 Canvas =============== */
+    #starfield {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -4;
+    }
+
+    /* =============== 光标系统 =============== */
+    .cursor-main {
+      position: fixed;
+      width: 12px; height: 12px;
+      background: #00d4ff;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: screen;
+      filter: blur(0.5px);
+      box-shadow: 0 0 10px var(--primary-light);
+      opacity: 0.8;
+    }
+
+    .cursor-ripple {
+      position: fixed;
+      width: 40px; height: 40px;
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      pointer-events: none;
+      z-index: 9998;
+      opacity: 0;
+      animation: ripple 1.2s ease-out forwards;
+    }
+
+    /* =============== 模式切换按钮 =============== */
+    .mode-toggle {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: rgba(30, 40, 70, 0.6);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--primary-light);
+      font-size: 1.4rem;
+      z-index: 1000;
+      cursor: pointer;
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-light);
+      box-shadow: var(--glow);
+      transition: all 0.4s;
+    }
+
+    .mode-toggle:hover {
+      transform: scale(1.1);
+      background: rgba(50, 70, 100, 0.8);
+    }
+
+    /* =============== 加载器 =============== */
+    .loader {
+      position: fixed;
+      inset: 0;
+      background: #03030a;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      color: var(--primary-light);
+    }
+
+    .loader .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 4rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 30px;
+    }
+
+    .loader .bar {
+      width: 0%;
+      height: 4px;
+      background: var(--primary-light);
+      border-radius: 2px;
+      animation: loadBar 2.5s ease-in-out forwards;
+      box-shadow: var(--glow);
+    }
+
+    @keyframes loadBar {
+      0% { width: 0; }
+      70% { width: 90%; }
+      100% { width: 100%; }
+    }
+
+    /* =============== 导航栏 =============== */
+    nav {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      padding: 36px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      background: rgba(20, 30, 50, 0.3);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* =============== 内容区域 =============== */
+    .content {
+      position: relative;
+      z-index: 1;
+      overflow: auto;
+      height: 100vh;
+      scroll-behavior: smooth;
+    }
+
+    header {
+      text-align: center;
+      padding: 220px 20px 120px;
+    }
+
+    header h1 {
+      font-size: 6.4rem;
+      font-weight: 800;
+      letter-spacing: -4px;
+      margin-bottom: 24px;
+      background: linear-gradient(90deg, var(--text), var(--primary-light), var(--text));
+      background-size: 300% auto;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: textShine 6s linear infinite;
+    }
+
+    header .subtitle {
+      font-size: 1.8rem;
+      max-width: 960px;
+      margin: 0 auto;
+      color: var(--text-light);
+      opacity: 0.95;
+      line-height: 1.8;
+    }
+
+    header .subtitle .lang {
+      display: block;
+      margin-top: 8px;
+      font-weight: 400;
+      opacity: 0.8;
+    }
+
+    .section {
+      background: var(--card-bg);
+      margin: 120px 0;
+      padding: 80px;
+      border-radius: 32px;
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-light);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35), var(--glow);
+      opacity: 0;
+      transform: translateY(80px);
+      animation: fadeIn 1s forwards;
+    }
+
+    .section:nth-child(2) { animation-delay: 0.5s; }
+    .section:nth-child(3) { animation-delay: 1.0s; }
+
+    .section h2 {
+      font-size: 3.6rem;
+      margin-bottom: 50px;
+      color: var(--primary-light);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-weight: 600;
+    }
+
+    .section h2 i {
+      font-size: 2.2rem;
+      color: var(--primary);
+    }
+
+    .intro-content p {
+      font-size: 1.5rem;
+      margin-bottom: 32px;
+      color: var(--text-light);
+      line-height: 2.1;
+    }
+
+    .app-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+    }
+
+    .app-item {
+      background: rgba(40, 50, 80, 0.5);
+      padding: 40px;
+      border-radius: 24px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+      transition: all 0.6s cubic-bezier(0.1, 0.9, 0.2, 1);
+      cursor: pointer;
+    }
+
+    .app-item:hover {
+      transform: translateY(-12px) scale(1.03);
+      background: rgba(50, 70, 100, 0.6);
+      box-shadow: var(--glow-strong), 0 24px 48px rgba(0, 0, 0, 0.4);
+      border-color: rgba(0, 212, 255, 0.5);
+    }
+
+    .app-item h3 {
+      font-size: 1.8rem;
+      color: var(--primary-light);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+    }
+
+    .app-item i {
+      font-size: 1.4rem;
+    }
+
+    .app-item p {
+      font-size: 1.1rem;
+      color: var(--text-light);
+      line-height: 1.8;
+    }
+
+    /* =============== 终端模拟器 =============== */
+    .terminal {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      width: 80vw;
+      max-width: 1000px;
+      height: 70vh;
+      background: #0a0a1a;
+      border-radius: 24px;
+      border: 1px solid var(--primary);
+      box-shadow: 0 0 60px rgba(0, 180, 219, 0.5);
+      z-index: 1000;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.6s ease-out;
+    }
+
+    .terminal.active {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    .terminal-header {
+      background: #1a1a2a;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-light);
+      font-size: 1.1rem;
+    }
+
+    .terminal-close {
+      cursor: pointer;
+      color: #ff5555;
+      font-weight: bold;
+    }
+
+    .terminal-body {
+      height: calc(100% - 60px);
+      padding: 20px;
+      color: #00d4ff;
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      overflow-y: auto;
+      background: #080818;
+    }
+
+    .terminal-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 14px;
+      background: #00d4ff;
+      margin-left: 4px;
+      animation: terminalBlink 1s step-end infinite;
+    }
+
+    /* =============== 响应式 =============== */
+    @media (max-width: 768px) {
+      header h1 { font-size: 3.8rem; }
+      header .subtitle { font-size: 1.4rem; }
+      .section { padding: 50px 20px; }
+      nav { padding: 24px; }
+      .logo { font-size: 1.8rem; }
+      .mode-toggle { width: 50px; height: 50px; font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 背景 -->
+  <div class="bg-gradient"></div>
+  <div class="glow" style="top:20%;left:20%;background-color:rgba(0,180,219,0.2);"></div>
+  <div class="glow" style="top:60%;right:20%;background-color:rgba(130,100,255,0.15);"></div>
+
+  <!-- 星图 -->
+  <canvas id="starfield"></canvas>
+
+  <!-- 光标 -->
+  <div class="cursor-main"></div>
+
+  <!-- 加载器 -->
+  <div class="loader">
+    <div class="logo"><i class="fas fa-satellite-dish"></i> Urbit</div>
+    <div style="width:280px;height:4px;background:#1a1a2a;border-radius:2px;overflow:hidden;"><div class="bar"></div></div>
+  </div>
+
+  <!-- 导航栏 -->
+  <nav>
+    <div class="logo">
+      <i class="fas fa-satellite-dish"></i>
+      <span>Urbit</span>
+    </div>
+  </nav>
+
+  <!-- 模式切换 -->
+  <div class="mode-toggle" id="modeToggle" title="切换模式：艺术 / 官网">
+    <i class="fas fa-paint-brush"></i>
+  </div>
+
+  <!-- 终端模拟器 -->
+  <div class="terminal" id="terminal">
+    <div class="terminal-header">
+      <span>Urbit OS Terminal</span>
+      <span class="terminal-close" onclick="closeTerminal()">✕</span>
+    </div>
+    <div class="terminal-body" id="terminalBody">
+      <p>~zod:dojo> |start %garden</p>
+      <p>activated %garden</p>
+      <p>~zod:garden> |start %chat</p>
+      <p>activated %chat</p>
+      <p>~zod:chat> |join ~bitbet-bolbel/urbit-community</p>
+      <p>joining ~bitbet-bolbel/urbit-community...</p>
+      <p>connected. type '?' for help.</p>
+      <div class="terminal-cursor"></div>
+    </div>
+  </div>
+
+  <!-- 内容 -->
+  <div class="content">
+
+    <header>
+      <h1>Urbit</h1>
+      <div class="subtitle">
+        <span>你数字主权的起点</span>
+        <span class="lang">The Origin of Your Digital Sovereignty</span>
+      </div>
+    </header>
+
+    <section class="section">
+      <h2><i class="fas fa-globe-americas"></i> 重新定义网络 / Redefining the Web</h2>
+      <div class="intro-content">
+        <p>Urbit 不是一个应用，而是一个全新的计算范式。每个用户拥有一个永久的“星球”，作为你数字身份的唯一锚点。</p>
+        <p>Urbit is not an app — it's a new computing paradigm. Every user owns a permanent "planet" as the anchor of their digital identity.</p>
+        <p>所有数据、通信、创作都由你掌控，运行在你自己的虚拟服务器上。没有广告，没有算法操控，没有数据贩卖。</p>
+        <p>All your data, communication, and creations are under your control, running on your own virtual server. No ads, no algorithmic manipulation, no data selling.</p>
+        <p>这是互联网本该有的样子——持久、安全、属于你。</p>
+        <p>This is what the internet was meant to be — persistent, secure, and truly yours.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2><i class="fas fa-cubes"></i> 核心系统 / Core Systems</h2>
+      <ul class="app-list">
+        <li class="app-item" onclick="openTerminal()">
+          <h3><i class="fas fa-comment-dots"></i> 聊天 / Chat</h3>
+          <p>端到端加密，支持频道、群组与跨星球通信。</p>
+          <p>End-to-end encrypted, with channels, groups, and inter-planet messaging.</p>
+        </li>
+        <li class="app-item" onclick="openTerminal()">
+          <h3><i class="fas fa-book-open"></i> 笔记 / Notebook</h3>
+          <p>你的第二大脑，支持版本控制与同步。</p>
+          <p>Your second brain with versioning and sync across devices.</p>
+        </li>
+        <li class="app-item" onclick="openTerminal()">
+          <h3><i class="fas fa-pen-nib"></i> 发布 / Publish</h3>
+          <p>博客与文档，直接托管在你的星球上。</p>
+          <p>Blogs and docs hosted directly on your planet.</p>
+        </li>
+        <li class="app-item" onclick="openTerminal()">
+          <h3><i class="fas fa-project-diagram"></i> 地图 / Maps</h3>
+          <p>订阅数据流，构建你的信息宇宙。</p>
+          <p>Subscribe to data feeds and build your information universe.</p>
+        </li>
+      </ul>
+    </section>
+
+    <footer style="text-align:center;padding:140px 20px 100px;color:var(--text-light);font-size:1.2rem;">
+      <p>© 2025 <strong>Urbit</strong> · 你的数字家园 / Your Digital Home | 
+         <a href="https://urbit.org" target="_blank" style="color:var(--primary-light);text-decoration:none;">官方文档 / Official Docs</a> | 
+         <a href="#" style="color:var(--primary-light);text-decoration:none;">加入社区 / Join Community</a>
+      </p>
+    </footer>
+
+  </div>
+
+  <script>
+    // === 3D 星图系统 ===
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initStars();
+    }
+
+    function initStars() {
+      stars = [];
+      for (let i = 0; i < 800; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          z: Math.random() * 1000,
+          radius: Math.random() * 1.5 + 0.5
+        });
+      }
+    }
+
+    function draw() {
+      ctx.fillStyle = 'rgba(6,6,20,0.2)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      stars.forEach(star => {
+        star.z -= 1;
+        if (star.z <= 0) star.z = 1000;
+
+        const x = (star.x - canvas.width/2) * (1000 / star.z) + canvas.width/2;
+        const y = (star.y - canvas.height/2) * (1000 / star.z) + canvas.height/2;
+        const size = (1 - star.z / 1000) * star.radius * 2;
+
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 180, 219, ${0.5 + 0.5 * (1 - star.z/1000)})`;
+        ctx.fill();
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    // === 交互系统 ===
+    document.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+
+      const cursor = document.querySelector('.cursor-main');
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+
+      if (Math.random() < 0.03) {
+        const ripple = document.createElement('div');
+        ripple.classList.add('cursor-ripple');
+        ripple.style.left = e.clientX + 'px';
+        ripple.style.top = e.clientY + 'px';
+        document.body.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 1200);
+      }
+    });
+
+    // === 终端系统 ===
+    function openTerminal() {
+      document.getElementById('terminal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeTerminal() {
+      document.getElementById('terminal').classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+
+    // === 模式切换 ===
+    document.getElementById('modeToggle').addEventListener('click', function() {
+      const isArt = this.innerHTML.includes('paint-brush');
+      if (isArt) {
+        this.innerHTML = '<i class="fas fa-globe"></i>';
+        this.title = '切换模式：官网 / 官网';
+        document.getElementById('starfield').style.opacity = '0';
+        setTimeout(() => document.getElementById('starfield').style.display = 'none', 600);
+      } else {
+        this.innerHTML = '<i class="fas fa-paint-brush"></i>';
+        this.title = '切换模式：艺术 / 官网';
+        document.getElementById('starfield').style.display = 'block';
+        setTimeout(() => document.getElementById('starfield').style.opacity = '1', 100);
+      }
+    });
+
+    // === 加载完成 ===
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.querySelector('.loader').style.opacity = '0';
+        setTimeout(() => document.querySelector('.loader').remove(), 800);
+        document.body.style.overflow = 'auto';
+      }, 800);
+    });
+
+    // 初始化
+    window.addEventListener('resize', resize);
+    resize();
+    draw();
+  </script>
+</body>
+</html>
