@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Invisible Builders</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #00F5FF;
+      --dark: #0F1A2C;
+      --card: #1A3652;
+      --text: #E0F7FA;
+      --border: #00B8B8;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    header {
+      text-align: center;
+      padding: 4rem 1rem;
+      background: rgba(0, 21, 37, 0.5);
+      position: relative;
+    }
+    .lang-switch {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--primary);
+      color: var(--dark);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    h1 {
+      color: var(--primary);
+      margin: 0;
+      font-size: 3.5rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+      text-align: center;
+    }
+    .nav-links {
+      display: grid;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .nav-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1.8rem;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0, 245, 255, 0.1);
+    }
+    .nav-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      background: rgba(26, 54, 82, 0.8);
+    }
+    .nav-card h2 {
+      margin: 0;
+      color: var(--primary);
+      font-size: 1.8rem;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      background: rgba(0, 21, 37, 0.5);
+      color: var(--primary);
+      font-size: 0.9rem;
+    }
+    [lang="en"] { display: none; }
+    .show-en [lang="zh"] { display: none; }
+    .show-en [lang="en"] { display: block; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <button class="lang-switch" onclick="toggleLang()">EN</button>
+    <h1>Invisible Builders <span lang="zh">隐形构建者</span><span lang="en">Invisible Builders</span></h1>
+    <p lang="zh">共建匿名网络的未来</p>
+    <p lang="en">Building the future of anonymous networks together</p>
+  </header>
+
+  <div class="container">
+    <div class="nav-links">
+      <a href="sponsors.html" class="nav-card">
+        <h2>💎 <span lang="zh">项目赞助</span><span lang="en">Project Sponsorship</span></h2>
+        <p lang="zh">支持我们开源项目的持续开发</p>
+        <p lang="en">Support the continuous development of our open source projects</p>
+      </a>
+      <a href="https://github.com/i2p" target="_blank" class="nav-card">
+        <h2>🐙 <span lang="zh">代码仓库</span><span lang="en">Code Repository</span></h2>
+        <p lang="zh">参与 I2P 生态的开源贡献</p>
+        <p lang="en">Contribute to the I2P ecosystem</p>
+      </a>
+      <a href="https://forum.i2p/" target="_blank" class="nav-card">
+        <h2>💬 <span lang="zh">社区论坛</span><span lang="en">Community Forum</span></h2>
+        <p lang="zh">与开发者和用户交流</p>
+        <p lang="en">Connect with developers and users</p>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <p lang="zh">© 2025 Invisible Builders · 致力于推广 I2P 匿名网络技术</p>
+    <p lang="en">© 2025 Invisible Builders · Advancing I2P anonymous network technology</p>
+  </footer>
+
+  <script>
+    function toggleLang() {
+      document.body.classList.toggle('show-en');
+      const btn = document.querySelector('.lang-switch');
+      btn.textContent = document.body.classList.contains('show-en') ? '中文' : 'EN';
+    }
+  </script>
+
+</body>
+</html>
