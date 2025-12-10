@@ -1,132 +1,446 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Invisible Builders</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #00F5FF;
-      --dark: #0F1A2C;
-      --card: #1A3652;
-      --text: #E0F7FA;
-      --border: #00B8B8;
-    }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--dark);
-      color: var(--text);
-      margin: 0;
-      padding: 0;
-      line-height: 1.6;
-    }
-    header {
-      text-align: center;
-      padding: 4rem 1rem;
-      background: rgba(0, 21, 37, 0.5);
-      position: relative;
-    }
-    .lang-switch {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: var(--primary);
-      color: var(--dark);
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 700;
-    }
-    h1 {
-      color: var(--primary);
-      margin: 0;
-      font-size: 3.5rem;
-    }
-    .container {
-      max-width: 800px;
-      margin: 3rem auto;
-      padding: 0 1rem;
-      text-align: center;
-    }
-    .nav-links {
-      display: grid;
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-    .nav-card {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 1.8rem;
-      text-decoration: none;
-      color: var(--text);
-      transition: all 0.3s ease;
-      border: 1px solid rgba(0, 245, 255, 0.1);
-    }
-    .nav-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-      background: rgba(26, 54, 82, 0.8);
-    }
-    .nav-card h2 {
-      margin: 0;
-      color: var(--primary);
-      font-size: 1.8rem;
-    }
-    footer {
-      text-align: center;
-      padding: 2rem;
-      background: rgba(0, 21, 37, 0.5);
-      color: var(--primary);
-      font-size: 0.9rem;
-    }
-    [lang="en"] { display: none; }
-    .show-en [lang="zh"] { display: none; }
-    .show-en [lang="en"] { display: block; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verdant Path INC - 运营隐私设施与赞助隐私软件</title>
+    <style>
+        /* --- 基础样式重置 --- */
+        :root {
+            --primary-color: #4CAF50;
+            --primary-dark: #388E3C;
+            --text-light: #E0E0E0;
+            --text-muted: #AAAAAA;
+            --bg-dark: #121212;
+            --bg-card: #1E1E1E;
+            --bg-overlay: rgba(0, 0, 0, 0.8);
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--primary-dark);
+        }
+
+        /* --- 导航栏 --- */
+        header {
+            padding: 1rem 5%;
+            background: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .logo span {
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        /* --- 通用容器 --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* --- 英雄区域 --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            padding-top: 4rem;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #FFFFFF, var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* --- 通用内容区域样式 --- */
+        section {
+            padding: 5rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* --- 业务介绍 --- */
+        .features {
+            background-color: #191919;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background-color: var(--bg-card);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 {
+            color: #FFFFFF;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        /* --- 模态框样式 --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: var(--bg-overlay);
+        }
+
+        .modal-content {
+            background-color: var(--bg-card);
+            margin: 15% auto;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .group-link {
+            word-break: break-all;
+            margin: 1rem 0;
+            color: var(--primary-color);
+            font-family: monospace;
+        }
+
+        /* --- 页脚 --- */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: #000000;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* --- 语言切换 --- */
+        .lang-switch {
+            margin-left: 1rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .lang-switch.active {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* 隐藏类用于多语言 */
+        .en { display: none; }
+    </style>
 </head>
 <body>
 
-  <header>
-    <button class="lang-switch" onclick="toggleLang()">EN</button>
-    <h1>Invisible Builders <span lang="zh">隐形构建者</span><span lang="en">Invisible Builders</span></h1>
-    <p lang="zh">共建匿名网络的未来</p>
-    <p lang="en">Building the future of anonymous networks together</p>
-  </header>
+    <!-- 导航栏 -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">Verdant <span>Path</span> INC</div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#home" class="nav-link">首页 <span class="en">Home</span></a></li>
+                    <li><a href="#services" class="nav-link">业务 <span class="en">Services</span></a></li>
+                    <li><a href="#about" class="nav-link">关于我们 <span class="en">About</span></a></li>
+                    <li><a href="#contact" class="nav-link">联系 <span class="en">Contact</span></a></li>
+                </ul>
+            </nav>
+            <div>
+                <span class="lang-switch" onclick="setLang('zh')">中文</span> | <span class="lang-switch" onclick="setLang('en')">EN</span>
+            </div>
+        </div>
+    </header>
 
-  <div class="container">
-    <div class="nav-links">
-      <a href="sponsors.html" class="nav-card">
-        <h2>💎 <span lang="zh">项目赞助</span><span lang="en">Project Sponsorship</span></h2>
-        <p lang="zh">支持开源项目的持续开发</p>
-        <p lang="en"> Support the continuous development of open source projects</p>
-      </a>
-      <a href="https://github.com/i2p" target="_blank" class="nav-card">
-        <h2>🐙 <span lang="zh">代码仓库</span><span lang="en">Code Repository</span></h2>
-        <p lang="zh">参与 I2P 生态的开源贡献</p>
-        <p lang="en">Contribute to the I2P ecosystem</p>
-      </a>
-      <a href="https://forum.i2p/" target="_blank" class="nav-card">
-        <h2>💬 <span lang="zh">社区论坛</span><span lang="en">Community Forum</span></h2>
-        <p lang="zh">与开发者和用户交流</p>
-        <p lang="en">Connect with developers and users</p>
-      </a>
+    <!-- 英雄区域 -->
+    <section id="home" class="hero">
+        <div class="container hero-content">
+            <h1>构建私密的数字未来</h1>
+            <p class="zh">Verdant Path INC 致力于运营高安全性的隐私设施，并资助推动隐私技术发展的开源软件项目。</p>
+            <p class="en" style="display:none;">Verdant Path INC is dedicated to operating high-security privacy infrastructure and funding open-source software projects that advance privacy technologies.</p>
+            <button onclick="openModal()" class="btn">加入群组 <span class="en">Join Group</span></button>
+        </div>
+    </section>
+
+    <!-- 业务介绍 -->
+    <section id="services" class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2 class="zh">我们的业务</h2>
+                <h2 class="en" style="display:none;">Our Services</h2>
+                <p class="zh">专注于隐私基础设施建设与软件生态支持</p>
+                <p class="en" style="display:none;">Focus on privacy infrastructure construction and software ecosystem support</p>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3 class="zh">运营隐私设施</h3>
+                    <h3 class="en" style="display:none;">Privacy Infrastructure</h3>
+                    <p class="zh">我们运营着高性能、抗审查的隐私网络基础设施。通过分布式节点和加密技术，确保用户的数据传输安全与匿名性。</p>
+                    <p class="en" style="display:none;">We operate high-performance, censorship-resistant privacy network infrastructure. Through distributed nodes and encryption, we ensure secure and anonymous data transmission.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="zh">赞助隐私软件</h3>
+                    <h3 class="en" style="display:none;">Sponsor Privacy Software</h3>
+                    <p class="zh">我们积极寻找并资助优秀的开源隐私软件开发者。通过资金支持，帮助他们将保护隐私的工具推向市场。</p>
+                    <p class="en" style="display:none;">We actively seek and fund优秀的 open-source privacy software developers. Through financial support, we help bring privacy tools to the market.</p>
+                </div>
+                
+        
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于我们 -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="section-title">
+                <h2 class="zh">关于 Verdant Path</h2>
+                <h2 class="en" style="display:none;">About Verdant Path</h2>
+                <p class="zh">为什么选择我们？</p>
+                <p class="en" style="display:none;">Why choose us?</p>
+            </div>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3 class="zh">我们的使命</h3>
+                    <h3 class="en" style="display:none;">Our Mission</h3>
+                    <p class="zh">在数字世界中，隐私不应是奢侈品，而应是基本权利。</p>
+                    <p class="en" style="display:none;">In the digital world, privacy should not be a luxury, but a fundamental right.</p>
+                    <ul class="zh">
+                        <li><strong>透明化：</strong> 我们的资助流向和运营原则公开透明。</li>
+                        <li><strong>安全性：</strong> 采用行业领先的安全标准。</li>
+                        <li><strong>社区化：</strong> 与全球开发者社区紧密合作。</li>
+                    </ul>
+                    <ul class="en" style="display:none;">
+                        <li><strong>Transparency:</strong> Our funding flows and operational principles are open and transparent.</li>
+                        <li><strong>Security:</strong> We adopt industry-leading security standards.</li>
+                        <li><strong>Community:</strong> We work closely with the global developer community.</li>
+                    </ul>
+                </div>
+                <div class="about-image">
+                    <div style="height: 300px; background: linear-gradient(45deg, #1a1a1a, #2a2a2a); border-radius: var(--border-radius); display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                        [隐私保护概念图]
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系我们 -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="section-title">
+                <h2 class="zh">联系我们</h2>
+                <h2 class="en" style="display:none;">Contact Us</h2>
+                <p class="zh">对我们的设施或赞助计划感兴趣？请随时留言。</p>
+                <p class="en" style="display:none;">Interested in our infrastructure or sponsorship? Feel free to leave a message.</p>
+            </div>
+            <form class="contact-form" onsubmit="alert('感谢您的留言！（演示用）'); return false;">
+                <input type="text" placeholder="您的姓名 / Your Name" required>
+                <input type="email" placeholder="您的邮箱 / Your Email" required>
+                <textarea rows="5" placeholder="您的消息... / Your Message..."></textarea>
+                <button type="submit" class="btn">发送消息 <span class="en">Send</span></button>
+            </form>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Verdant Path INC. 保留所有权利。</p>
+        </div>
+    </footer>
+
+    <!-- --- 模态框 (群组链接) --- -->
+    <div id="groupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>社群链接</h3>
+            <p>请点击下方链接加入我们的群组：</p>
+            <!-- ⚠️ 请在下方修改为您真实的群组链接 -->
+            <div class="group-link">https://example.com/your-private-group-link</div>
+            <button onclick="copyLink()" style="margin-top: 1rem;" class="btn">复制链接</button>
+        </div>
     </div>
-  </div>
 
-  <footer>
-    <p lang="zh">© 2025 Invisible Builders · 致力于推广 I2P 匿名网络技术</p>
-    <p lang="en">© 2025 Invisible Builders · Advancing I2P anonymous network technology</p>
-  </footer>
+    <script>
+        // 获取模态框元素
+        var modal = document.getElementById("groupModal");
 
-  <script>
-    function toggleLang() {
-      document.body.classList.toggle('show-en');
-      const btn = document.querySelector('.lang-switch');
-      btn.textContent = document.body.classList.contains('show-en') ? '中文' : 'EN';
-    }
-  </script>
+        // 打开模态框
+        function openModal() {
+            modal.style.display = "block";
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // 复制链接功能
+        function copyLink() {
+            // ⚠️ 请修改这里的链接为您真实的链接
+            const link = 'https://example.com/your-private-group-link';
+            navigator.clipboard.writeText(link).then(() => {
+                alert('链接已复制到剪贴板！');
+            });
+        }
+
+        // --- 多语言切换逻辑 ---
+        function setLang(lang) {
+            // 移除所有元素的显示
+            document.querySelectorAll('.zh').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.en').forEach(el => { el.style.display = 'none'; });
+            
+            // 根据选择显示对应语言
+            if (lang === 'zh') {
+                document.querySelectorAll('.zh').forEach(el => { el.style.display = 'block'; });
+            } else {
+                document.querySelectorAll('.en').forEach(el => { el.style.display = 'inline'; }); // 对于内联元素使用 inline
+                // 特殊处理段落等块级元素
+                document.querySelectorAll('p.en, h1.en, h2.en, h3.en, li.en, ul.en').forEach(el => { el.style.display = 'block'; });
+            }
+            
+            // 保存语言设置到本地存储
+            localStorage.setItem('preferredLang', lang);
+        }
+
+        // 页面加载时检查本地存储的语言设置
+        window.onload = function() {
+            const savedLang = localStorage.getItem('preferredLang') || 'zh';
+            setLang(savedLang);
+        }
+    </script>
 
 </body>
 </html>
