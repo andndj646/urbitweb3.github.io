@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LibreSeek · 自由搜</title>
+  <meta name="description" content="A censorship-resistant directory for Clearnet & I2P sites. Submit without approval.">
+  <style>
+    :root {
+      --bg: #f9fafb;
+      --text: #1f2937;
+      --card-bg: #ffffff;
+      --border: #e5e7eb;
+      --primary: #4f46e5;
+      --i2p-color: #8b5cf6;
+      --clearnet-color: #10b981;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    [data-theme="dark"] {
+      --bg: #111827;
+      --text: #f3f4f6;
+      --card-bg: #1f2937;
+      --border: #374151;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 20px;
+      transition: background 0.3s;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin: 30px 0;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, var(--i2p-color), var(--clearnet-color));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .subtitle {
+      opacity: 0.8;
+      margin-bottom: 20px;
+    }
+    .lang-switch {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px;
+      display: flex;
+    }
+    .lang-btn {
+      padding: 6px 12px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-radius: 16px;
+      font-size: 0.9rem;
+    }
+    .lang-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    .search-box {
+      width: 100%;
+      padding: 14px 20px;
+      font-size: 1.1rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card-bg);
+      margin: 20px 0 30px;
+      box-shadow: var(--shadow);
+    }
+    .filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 6px 16px;
+      border: none;
+      border-radius: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    .result {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .result-title a {
+      font-size: 1.3rem;
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: white;
+    }
+    .badge.i2p { background: var(--i2p-color); }
+    .badge.clearnet { background: var(--clearnet-color); }
+    .submit-section {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px dashed var(--border);
+    }
+    .submit-btn {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 12px 28px;
+      text-decoration: none;
+      border-radius: 30px;
+      font-weight: bold;
+      margin-top: 10px;
+      transition: opacity 0.2s;
+    }
+    .submit-btn:hover { opacity: 0.9; }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      opacity: 0.7;
+      font-size: 0.9rem;
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 2rem; }
+      .lang-switch { position: static; margin: 20px auto; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="lang-switch" id="langSwitch">
+      <button class="lang-btn" data-lang="zh">中文</button>
+      <button class="lang-btn" data-lang="en">English</button>
+    </div>
+
+    <header>
+      <h1>LibreSeek · 自由搜</h1>
+      <p class="subtitle" id="subtitle">一个抗审查的明网与I2P网站目录。无需审核，人人可提交。</p>
+    </header>
+
+    <input type="text" class="search-box" id="search" placeholder="搜索网站标题、描述或标签..." />
+
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">全部 All</button>
+      <button class="filter-btn" data-filter="clearnet">明网 Clearnet</button>
+      <button class="filter-btn" data-filter="i2p">I2P 暗网</button>
+    </div>
+
+    <div id="results"></div>
+
+    <div class="submit-section">
+      <h3 id="submitTitle">贡献你的网站</h3>
+      <p id="submitDesc">任何人都可以提交网站！点击下方按钮，编辑 JSON 文件并保存即可（无需审核）。</p>
+      <!-- 替换 YOUR_GIST_URL 为你的 Gist raw 链接 -->
+      <a href="https://gist.github.com/YOUR_USERNAME/YOUR_GIST_ID/edit" class="submit-btn" target="_blank" id="submitBtn">➕ 提交网站</a>
+    </div>
+
+    <footer>
+      <p>LibreSeek · 去中心化 · 永久在线 · 抗审查</p>
+      <p>Deployed on IPFS / Arweave | Open Source</p>
+    </footer>
+  </div>
+
+  <script>
+    // 多语言文案
+    const translations = {
+      zh: {
+        subtitle: "一个抗审查的明网与I2P网站目录。无需审核，人人可提交。",
+        submitTitle: "贡献你的网站",
+        submitDesc: "任何人都可以提交网站！点击下方按钮，编辑 JSON 文件并保存即可（无需审核）。",
+        submitBtn: "➕ 提交网站",
+        placeholder: "搜索网站标题、描述或标签...",
+        all: "全部",
+        clearnet: "明网",
+        i2p: "I2P 暗网"
+      },
+      en: {
+        subtitle: "A censorship-resistant directory for Clearnet & I2P sites. Submit without approval.",
+        submitTitle: "Contribute Your Site",
+        submitDesc: "Anyone can submit! Click below, edit the JSON file, and save (no review needed).",
+        submitBtn: "➕ Submit Site",
+        placeholder: "Search by title, description, or tags...",
+        all: "All",
+        clearnet: "Clearnet",
+        i2p: "I2P"
+      }
+    };
+
+    // 检测浏览器语言
+    const browserLang = navigator.language.startsWith('zh') ? 'zh' : 'en';
+    let currentLang = localStorage.getItem('lang') || browserLang;
+
+    // 加载多语言
+    function loadLanguage(lang) {
+      document.getElementById('subtitle').textContent = translations[lang].subtitle;
+      document.getElementById('submitTitle').textContent = translations[lang].submitTitle;
+      document.getElementById('submitDesc').textContent = translations[lang].submitDesc;
+      document.getElementById('submitBtn').textContent = translations[lang].submitBtn;
+      document.getElementById('search').placeholder = translations[lang].placeholder;
+
+      // 更新过滤器文本
+      document.querySelectorAll('.filter-btn').textContent = translations[lang].all;
+      document.querySelectorAll('.filter-btn').textContent = translations[lang].clearnet;
+      document.querySelectorAll('.filter-btn').textContent = translations[lang].i2p;
+
+      // 切换按钮高亮
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+    }
+
+    // 切换语言事件
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => loadLanguage(btn.dataset.lang));
+    });
+
+    // 数据加载
+    let sites = [];
+    const resultsDiv = document.getElementById('results');
+    const searchInput = document.getElementById('search');
+
+    // 替换为你的 Gist raw URL（示例）
+    const DATA_URL = 'https://gist.githubusercontent.com/YOUR_USERNAME/YOUR_GIST_ID/raw/sites.json';
+
+    fetch(DATA_URL)
+      .then(res => res.json())
+      .then(data => {
+        sites = data;
+        renderResults(sites);
+      })
+      .catch(err => {
+        resultsDiv.innerHTML = '<p style="color:red;">❌ 无法加载网站数据。请检查网络或稍后重试。</p>';
+        console.error(err);
+      });
+
+    // 渲染结果
+    function renderResults(list) {
+      if (list.length === 0) {
+        resultsDiv.innerHTML = `<p>${currentLang === 'zh' ? '未找到结果' : 'No results found'}</p>`;
+        return;
+      }
+
+      resultsDiv.innerHTML = list.map(site => {
+        const title = site[`title_${currentLang}`] || site.title;
+        const desc = site[`description_${currentLang}`] || site.description;
+        const badgeText = site.type === 'i2p' ? (currentLang === 'zh' ? 'I2P 暗网' : 'I2P') : (currentLang === 'zh' ? '明网' : 'Clearnet');
+        const badgeClass = site.type === 'i2p' ? 'i2p' : 'clearnet';
+
+        return `
+          <div class="result">
+            <div class="result-header">
+              <div class="result-title">
+                <a href="${site.url}" target="_blank" rel="noopener">${title}</a>
+              </div>
+              <span class="badge ${badgeClass}">${badgeText}</span>
+            </div>
+            <p>${desc}</p>
+            <small>${site.url}</small>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 搜索 & 过滤
+    let currentFilter = 'all';
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        performSearch();
+      });
+    });
+
+    function performSearch() {
+      const q = searchInput.value.toLowerCase();
+      let filtered = sites.filter(site => {
+        const matchesQuery = 
+          (site.title && site.title.toLowerCase().includes(q)) ||
+          (site.description && site.description.toLowerCase().includes(q)) ||
+          (site.tags && site.tags.some(tag => tag.toLowerCase().includes(q)));
+        
+        if (currentFilter === 'all') return matchesQuery;
+        return matchesQuery && site.type === currentFilter;
+      });
+      renderResults(filtered);
+    }
+
+    searchInput.addEventListener('input', performSearch);
+
+    // 初始化语言
+    loadLanguage(currentLang);
+  </script>
+</body>
+</html>
