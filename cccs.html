@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Decentralized Search Directory</title>
+  <!-- 极简内联样式仅用于基础可读性（可删除，但会非常朴素） -->
+  <style>body{font-family:monospace;max-width:700px;margin:2rem auto;padding:0 1rem}input{width:100%;padding:.5rem;margin:1rem 0}a{color:#00f;text-decoration:none}a:hover{text-decoration:underline}.tag{background:#eee;padding:0 .3rem;margin-right:.3rem}</style>
+</head>
+<body>
+  <h1>🌐 Decentralized Search Directory</h1>
+  <p>A human-curated list of clearnet & I2P sites.<br>
+     Data stored on Arweave. Updated manually by community.</p>
+
+  <p><strong>🔍 Add a site:</strong> 
+     <a href="https://github.com/yourname/decentralized-search-dir/issues" target="_blank">Submit via GitHub</a></p>
+
+  <input type="text" id="q" placeholder="Search by name, tag or description..." autofocus>
+
+  <div id="list"></div>
+
+  <script>
+    // 从 Arweave 加载数据（替换 YOUR_TXID 为实际值）
+    fetch('https://arweave.net/YOUR_TXID')
+      .then(r => r.json())
+      .then(data => {
+        window.sites = data.sites;
+        document.body.innerHTML += `<p><small>✅ Loaded ${data.sites.length} sites (v${data.version})</small></p>`;
+        render();
+      })
+      .catch(e => {
+        console.warn("Failed to load from Arweave, using fallback");
+        window.sites = [];
+      });
+
+    function render(query = '') {
+      const q = query.toLowerCase();
+      const filtered = q ? window.sites.filter(s =>
+        s.name.toLowerCase().includes(q) ||
+        s.description.toLowerCase().includes(q) ||
+        s.tags.some(t => t.toLowerCase().includes(q))
+      ) : window.sites;
+
+      const html = filtered.map(s => `
+        <div style="margin:1.2em 0;border-left:2px solid #ccc;padding-left:1em">
+          <h3><a href="${s.url}" target="_blank">${s.name}</a></h3>
+          <p>${s.description}</p>
+          <div>${s.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+          <small>${s.url}</small>
+        </div>
+      `).join('');
+
+      document.getElementById('list').innerHTML = html || '<p>No results.</p>';
+    }
+
+    document.getElementById('q').addEventListener('input', e => render(e.target.value));
+  </script>
+</body>
+</html>
+
