@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌐 Decentralized Search</title>
+  <style>
+    /* ===== 全局重置 & 响应式基础 ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #ffffff;
+      --text: #2d3748;
+      --muted: #718096;
+      --card-bg: #f8fafc;
+      --border: #e2e8f0;
+      --primary: #4299e1;
+      --success: #48bb78;
+      --warning: #ed8936;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --radius: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a202c;
+        --text: #e2e8f0;
+        --muted: #a0aec0;
+        --card-bg: #2d3748;
+        --border: #4a5568;
+        --shadow: 0 2px 8px rgba(0,0,0,0.2);
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* ===== 头部 ===== */
+    header {
+      text-align: center;
+      margin: 24px 0 16px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #4299e1, #805ad5);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    /* ===== 搜索框 ===== */
+    .search-container {
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      padding: 12px 0;
+      z-index: 10;
+      margin: -16px -16px 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    #q {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var50px;
+      background: var(--card-bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #q:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+    }
+
+    /* ===== 状态栏 ===== */
+    #status {
+      text-align: center;
+      padding: 8px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .status-live { color: var(--success); }
+    .status-backup { color: var(--warning); }
+    .status-error { color: #e53e3e; }
+
+    /* ===== 网站卡片 ===== */
+    .site {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .site:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .site h3 {
+      margin-bottom: 8px;
+      font-size: 1.15rem;
+    }
+
+    .site a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .site a:hover {
+      text-decoration: underline;
+    }
+
+    .description {
+      color: var(--muted);
+      margin: 8px 0;
+      font-size: 0.95rem;
+    }
+
+    .tags {
+      margin-top: 10px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: rgba(66, 153, 225, 0.1);
+      color: var(--primary);
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      margin-right: 6px;
+      margin-bottom: 4px;
+    }
+
+    .url {
+      display: block;
+      color: var(--muted);
+      font-size: 0.85rem;
+      word-break: break-all;
+      margin-top: 8px;
+    }
+
+    /* ===== 提交入口 ===== */
+    .submit-link {
+      display: inline-block;
+      background: var(--primary);
+      color: white !important;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      text-decoration: none !important;
+      margin-top: 8px;
+    }
+
+    /* ===== 空状态 ===== */
+    .empty {
+      text-align: center;
+      padding: 32px 0;
+      color: var(--muted);
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      text-align: center;
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 12px; }
+      h1 { font-size: 1.5rem; }
+      .site { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Decentralized Search</h1>
+    <p class="subtitle">Human-curated directory of clearnet & I2P sites</p>
+    <p>
+      <a href="https://github.com/yourname/search-dir/issues" target="_blank" class="submit-link">
+        ➕ Add a Website
+      </a>
+    </p>
+  </header>
+
+  <div class="search-container">
+    <input type="text" id="q" placeholder="Search by name, tag or description..." autofocus />
+  </div>
+
+  <div id="status">Loading index...</div>
+  <div id="list"></div>
+
+  <footer>
+    <p>Works offline • No tracking • Data from server or Arweave backup</p>
+  </footer>
+
+  <script>
+    // ===== 配置区（你只需改这两行
